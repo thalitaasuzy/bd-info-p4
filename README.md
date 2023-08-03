@@ -2,7 +2,7 @@
 
 <h4> Sobre </h4>
 
-<img alt="bancodedados.jpg"  align="right"  height="280cm" src="https://github.com/thalitaasuzy/bd-info-p4/assets/112733274/484217bf-713a-4738-9d0d-7efa598a41e7"  />
+<img alt="bancodedados.jpg"  align="right"  height="250cm" src="https://github.com/thalitaasuzy/bd-info-p4/assets/112733274/484217bf-713a-4738-9d0d-7efa598a41e7"  />
 
 Banco de dados é uma coleção organizada de informações, estruturada de forma a permitir o armazenamento, o gerenciamento e a recuperação eficiente de dados. Ele é projetado para facilitar o acesso, a manipulação e a análise das informações armazenadas, tornando possível que sistemas, aplicativos e usuários consultem e atualizem os dados de maneira rápida e confiável.
 
