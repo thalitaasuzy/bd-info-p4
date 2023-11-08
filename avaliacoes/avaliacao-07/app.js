@@ -20,7 +20,7 @@ const db = new sqlite3.Database('SCA.db', (err) => {
 
 // Crie a tabela TB_CLIENTES, se ainda não existir
 db.run(
-  'CREATE TABLE IF NOT EXISTS TB_CLIENTES (id INTEGER PRIMARY KEY AUTOINCREMENT, nome_cli TEXT, )',
+  'CREATE TABLE IF NOT EXISTS TB_CLIENTES (id INTEGER PRIMARY KEY AUTOINCREMENT, nome_cli TEXT)',
   (err) => {
     if (err) {
       console.error('Erro ao criar tabela TB_CLIENTES:', err.message);
@@ -103,7 +103,7 @@ app.delete('/clientes/:id', (req, res) => {
 
 
 db.run(
-    'CREATE TABLE IF NOT EXISTS TB_VENDEDOR (id INTEGER PRIMARY KEY AUTOINCREMENT, nome_vend TEXT, )',
+    'CREATE TABLE IF NOT EXISTS TB_VENDEDOR (id INTEGER PRIMARY KEY AUTOINCREMENT, nome_vend TEXT)',
     (err) => {
       if (err) {
         console.error('Erro ao criar tabela TB_VENDEDOR:', err.message);
@@ -172,6 +172,114 @@ db.run(
     });
   });
   
+  db.run(
+    'CREATE TABLE IF NOT EXISTS TB_NOTAFISCAL (id INTEGER PRIMARY KEY AUTOINCREMENT, valor FLOAT, FOREIGN KEY (id) REFERENCES TB_CLIENTES(cliente_id), FOREIGN KEY (id) REFERENCES TB_VENDEDOR (vendedor_id))',
+    (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela TB_NOTAFISCAL:', err.message);
+      } else {
+        console.log('Tabela TB_NOTAFISCAL criada com sucesso.');
+      }
+    }
+  );
+
+  app.post('/notasFiscais', (req, res) => {
+    const {valor, cliente_id, vendedor_id} = req.body;
+    db.run('INSERT INTO TB_NOTAFISCAL (valor, cliente_id, vendedor_id) VALUES (?,?,?)', [valor, cliente_id, vendedor_id], (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ message: 'Nota Fiscal criada com sucesso' });
+    });
+  });
+
+  app.get('/notasFiscais', (req, res) => {
+    db.all('SELECT * FROM TB_NOTAFISCAL', (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ notasFiscais: rows });
+    });
+  });
+
+  app.get('/notasFiscais/:id', (req, res) => {
+    const { id } = req.params;
+    db.get('SELECT * FROM TB_NOTAFISCAL WHERE id = ?', [id], (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      if (!row) {
+        res.status(404).json({ message: 'Nota Fiscal não encontrada' });
+        return;
+      }
+      res.json({ notasFiscais: row }); 
+    });
+  });
+
+  app.put('/notasFiscais/:id', (req, res) => {
+    const { id } = req.params;
+    const { valor } = req.body;
+    const { cliente_id } = req.body;
+    const { vendedor_id } = req.body;
+
+    db.run('UPDATE TB_NOTAFISCAL SET valor, cliente_id, vendedor_id = ?,?,?, WHERE id = ?', [valor, cliente_id, vendedor_id, id], (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ message: 'Nota Fiscal atualizada com sucesso' });
+    });
+  });
+  
+  app.delete('/notasFiscais/:id', (req, res) => {
+    const { id } = req.params;
+    db.run('DELETE FROM TB_NOTAFISCAL WHERE id = ?', [id], (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ message: 'Nota Fiscal excluída com sucesso'});
+    });
+  });
+
+
+
+
+  db.run(
+    'CREATE TABLE IF NOT EXISTS TB_ITEM_NOTA_FISCAL (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade FLOAT, FOREIGN KEY (valor) REFERENCES TB_NOTAFISCAL(valor_item), unidade INTEGER , notafiscal_id INTEGER AUTOINCREMENT, produto_id INTEGER AUTOINCREMENT)',
+    (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela TB_ITEM_NOTA_FISCAL:', err.message);
+      } else {
+        console.log('Tabela TB_ITEM_NOTA_FISCAL criada com sucesso.');
+      }
+    }
+  );
+  app.post('/item_notafiscal', (req, res) => {
+    const {valor, cliente_id, vendedor_id} = req.body;
+    db.run('TB_ITEM_NOTA_FISCAL (valorm, cliente_id, vendedor_id) VALUES (?,?,?)', [valor, cliente_id, vendedor_id], (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ message: 'Nota Fiscal criada com sucesso' });
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Inicie o servidor
